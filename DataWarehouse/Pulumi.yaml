@@ -1,0 +1,3 @@
+name: GHD.Infrastructure
+runtime: dotnet
+description: infrastructure program for private datawarehouse

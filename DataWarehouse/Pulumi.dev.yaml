@@ -1,0 +1,29 @@
+config:
+  GHD.Infrastructure:Ad:
+    AdminGroup:
+      Key: "Name"
+      Value: "GUID"
+    UserGroup:
+      Key: "Name"
+      Value: "GUID"
+  GHD.Infrastructure:General:
+    SubscriptionId: GUID
+    TenantId: GUID
+    CompanyName: "GHD"
+    ProjectName: "DWH"
+  GHD.Infrastructure:Network:
+    Subnet:
+      Key: "Name"
+      Value: "GUID"
+  GHD.Infrastructure:Sql:
+    SqlDatabaseName: analytics
+    SqlDatabaseTier: S3
+    SqlServerAdmin: Ceteris.Admin
+    SqlServerPassword:
+      secure: AAABAM3MSQaQy7xBnuMaV8a8nhx2R3RAc4+VWRrnMof9qL7eVP55MFQTHg==
+  GHD.Infrastructure:Storage:
+    ContainerCuratedName: curated
+    ContainerImportName: import
+    ContainerSpeedName: speed
+  azure-native:location: westeurope
+  azure-native:partnerId: "4721357"
