@@ -40,10 +40,6 @@ class NetworkingStack : Stack
         var nsgBastionName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-nsg-bastion";
         var nsgDwhName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-nsg-dwh";
         var nsgMgmtName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-nsg-mgmt";
-        var dataFactoryName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-adf";
-        var privateEndpointSqlName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-pe-sql";
-        var privateEndpointBlobName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-pe-blob";
-        var privateEndpointAdfName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-pe-adf";
 
         // retrieve network and origin resource group
         var vnetRef = Output.Create(Network.GetVirtualNetwork.InvokeAsync(new Network.GetVirtualNetworkArgs
