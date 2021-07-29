@@ -1,0 +1,4 @@
+name: GHD.Network
+runtime: dotnet
+description: this project contains all network related components, which will not
+  change from dev to prod
