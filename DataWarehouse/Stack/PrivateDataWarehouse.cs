@@ -59,8 +59,21 @@ class PrivateDataWarehouse : Stack
         );
         
         // retrieve security groups for end user permissions from AD
-        var adSecurityGroupAdmin = Group.Get(config.Ad.AdminGroup.Key, config.Ad.AdminGroup.Value);
-        var adSecurityGroupUser = Group.Get(config.Ad.UserGroup.Key, config.Ad.UserGroup.Value);
+        var adSecurityGroupAdminRef = Output.Create(GetGroup.InvokeAsync(new GetGroupArgs
+        {
+            SecurityEnabled = true,
+            DisplayName = config.Ad.AdminGroup.Key
+            
+        }));
+        var adSecurityGroupAdminObjectId = adSecurityGroupAdminRef.Apply(x => x.Id) ?? throw new ArgumentNullException("Provide a valid admin group in your config!");
+        var adSecurityGroupAdminName = adSecurityGroupAdminRef.Apply(x => x.DisplayName) ?? throw new ArgumentNullException("Provide a valid admin group in your config!");
+
+        var adSecurityGroupUserRef = Output.Create(GetGroup.InvokeAsync(new GetGroupArgs
+        {
+            SecurityEnabled = true,
+            DisplayName = config.Ad.UserGroup.Key
+        }));
+        var adSecurityGroupUserObjectId = adSecurityGroupUserRef.Apply(x => x.Id) ?? throw new ArgumentNullException("Provide a valid user group in your config!");
         
         // retrieve dependent datamart subnet
         var subnetRef = Output.Create(GetSubnet.InvokeAsync(new GetSubnetArgs
@@ -138,11 +151,11 @@ class PrivateDataWarehouse : Stack
         {
             AdministratorName = "ActiveDirectory",
             AdministratorType = AdministratorType.ActiveDirectory,
-            Login = adSecurityGroupAdmin.Name,
+            Login = adSecurityGroupAdminName,
             ServerName = sqlServer.Name,
             ResourceGroupName = resourceGroupDatamart.Name,
             TenantId = config.General.TenantId ?? throw new ArgumentNullException("Provide a tenantId for this deployment!"),
-            Sid = adSecurityGroupAdmin.ObjectId
+            Sid = adSecurityGroupAdminObjectId
         });
 
         var sqlDatabase = new Database(config.Sql.SqlDatabaseName, new DatabaseArgs
@@ -280,7 +293,7 @@ class PrivateDataWarehouse : Stack
         var authAdminGroupToStorageName1 = new RandomUuid("authAdminGroupToStorageName1");
         var authAdminGroupToStorage1 = new RoleAssignment("authAdminGroupToStorage1", new RoleAssignmentArgs
         {
-            PrincipalId = adSecurityGroupAdmin.ObjectId,
+            PrincipalId = adSecurityGroupAdminObjectId,
             PrincipalType = "Group",
             RoleAssignmentName = authAdminGroupToStorageName1.Result,
             RoleDefinitionId = StackExtensions.RetrieveRoleDefinitionId("Storage Blob Data Owner", subscription),
@@ -290,7 +303,7 @@ class PrivateDataWarehouse : Stack
         var authAdminGroupToResourceGroupName = new RandomUuid("authAdminGroupToResourceGroupName");
         var authAdminGroupToResourceGroup = new RoleAssignment("authAdminGroupToResourceGroup", new RoleAssignmentArgs
         {
-            PrincipalId = adSecurityGroupAdmin.ObjectId,
+            PrincipalId = adSecurityGroupAdminObjectId,
             PrincipalType = "Group",
             RoleAssignmentName = authAdminGroupToResourceGroupName.Result,
             RoleDefinitionId = StackExtensions.RetrieveRoleDefinitionId("Contributor", subscription),
@@ -300,7 +313,7 @@ class PrivateDataWarehouse : Stack
         var authUserGroupToStorageName = new RandomUuid("authUserGroupToStorageName");
         var authUserGroupToStorage = new RoleAssignment("authUserGroupToStorage", new RoleAssignmentArgs
         {
-            PrincipalId = adSecurityGroupUser.ObjectId,
+            PrincipalId = adSecurityGroupUserObjectId,
             PrincipalType = "Group",
             RoleAssignmentName = authUserGroupToStorageName.Result,
             RoleDefinitionId = StackExtensions.RetrieveRoleDefinitionId("Storage Blob Data Reader", subscription),

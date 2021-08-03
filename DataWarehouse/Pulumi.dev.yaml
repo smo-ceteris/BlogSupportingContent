@@ -1,11 +1,7 @@
 config:
   GHD.Infrastructure:Ad:
-    AdminGroup:
-      Key: "Name"
-      Value: "GUID"
-    UserGroup:
-      Key: "Name"
-      Value: "GUID"
+    AdminGroupName: "AAD_DWH_Admins"
+    UserGroupName: "AAD_DWH_Reader"
   GHD.Infrastructure:General:
     SubscriptionId: "b7502c24-85e5-4b08-8b0a-0940ba314616"
     TenantId: "4bd3cadc-5929-40ab-87e9-da809fa2c8d4"
