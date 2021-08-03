@@ -2,20 +2,20 @@ config:
   azure-native:location: westeurope
   azure-native:partnerId: "4721357"
   GHD.Network:ResourceGroup:
-    ResourceGroupName: "Name"
+    ResourceGroupName: "GHD-DWH"
   GHD.Network:Network:
-    VnetName: "Name"
+    VnetName: "ghd-dwh-vnet"
   GHD.Network:General:
-    SubscriptionId: "GUID"
-    TenantId: "GUID"
+    SubscriptionId: "b7502c24-85e5-4b08-8b0a-0940ba314616"
+    TenantId: "4bd3cadc-5929-40ab-87e9-da809fa2c8d4"
     CompanyName: "GHD"
     ProjectName: "DWHNet"
   GHD.Network:Security:
-    SubnetDevAddressPrefix: "10.9.3.64/27"
-    SubnetQaAddressPrefix: "10.9.3.96/27"
-    SubnetProdAddressPrefix: "10.9.3.128/27"
-    SubnetBastionAddressPrefix: "10.9.3.32/27"
-    SubnetMgmtAddressPrefix: "10.9.3.0/27"
+    SubnetDevAddressPrefix: "10.5.1.64/27"
+    SubnetQaAddressPrefix: "10.5.1.96/27"
+    SubnetProdAddressPrefix: "10.5.1.128/27"
+    SubnetBastionAddressPrefix: "10.5.1.32/27"
+    SubnetMgmtAddressPrefix: "10.5.1.0/27"
     SubnetDevName: "Subnet-DEV"
     SubnetQaName: "Subnet-QA"
     SubnetProdName: "Subnet-PROD"

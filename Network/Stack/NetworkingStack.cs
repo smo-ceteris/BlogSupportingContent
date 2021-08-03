@@ -36,7 +36,6 @@ class NetworkingStack : Stack
         var subscription = config.General.SubscriptionId ?? throw new ArgumentNullException("Provide a subscriptionId in your config!");
 
         // configure naming conventions
-        var resourceGroupName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-rg";
         var nsgBastionName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-nsg-bastion";
         var nsgDwhName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-nsg-dwh";
         var nsgMgmtName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-nsg-mgmt";
