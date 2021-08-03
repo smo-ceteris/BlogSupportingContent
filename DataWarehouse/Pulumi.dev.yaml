@@ -7,14 +7,14 @@ config:
       Key: "Name"
       Value: "GUID"
   GHD.Infrastructure:General:
-    SubscriptionId: GUID
-    TenantId: GUID
+    SubscriptionId: "b7502c24-85e5-4b08-8b0a-0940ba314616"
+    TenantId: "4bd3cadc-5929-40ab-87e9-da809fa2c8d4"
     CompanyName: "GHD"
     ProjectName: "DWH"
   GHD.Infrastructure:Network:
-    Subnet:
-      Key: "Name"
-      Value: "GUID"
+    SubnetName: "Subnet-DEV"
+    VirtualNetworkName: "ghd-dwh-vnet"
+    ResourceGroupName: "GHD-DWH"
   GHD.Infrastructure:Sql:
     SqlDatabaseName: analytics
     SqlDatabaseTier: S3

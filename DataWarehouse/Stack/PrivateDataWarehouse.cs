@@ -63,7 +63,13 @@ class PrivateDataWarehouse : Stack
         var adSecurityGroupUser = Group.Get(config.Ad.UserGroup.Key, config.Ad.UserGroup.Value);
         
         // retrieve dependent datamart subnet
-        var subnetDatamart = Subnet.Get(config.Network.Subnet.Key, config.Network.Subnet.Value);
+        var subnetRef = Output.Create(GetSubnet.InvokeAsync(new GetSubnetArgs
+        {
+            SubnetName = config.Network.SubnetName,
+            VirtualNetworkName = config.Network.VirtualNetworkName,
+            ResourceGroupName = config.Network.ResourceGroupName,
+        }));
+        var SubnetId = subnetRef.Apply(x => x.Id) ?? throw new ArgumentNullException("Provide a valid subnet in your config!");
 
         // Create Storage Account and containers
         var storageAccount = new StorageAccount(storageAccountName, new StorageAccountArgs
@@ -188,7 +194,7 @@ class PrivateDataWarehouse : Stack
             ResourceGroupName = resourceGroupDatamart.Name,
             Subnet = new Pulumi.AzureNative.Network.Inputs.SubnetArgs
             {
-                Id = subnetDatamart.Id,
+                Id = SubnetId,
             }
         });
 
@@ -217,7 +223,7 @@ class PrivateDataWarehouse : Stack
             ResourceGroupName = resourceGroupDatamart.Name,
             Subnet = new Pulumi.AzureNative.Network.Inputs.SubnetArgs
             {
-                Id = subnetDatamart.Id,
+                Id = SubnetId,
             }
         });
 
@@ -246,7 +252,7 @@ class PrivateDataWarehouse : Stack
             ResourceGroupName = resourceGroupDatamart.Name,
             Subnet = new Pulumi.AzureNative.Network.Inputs.SubnetArgs
             {
-                Id = subnetDatamart.Id,
+                Id = SubnetId,
             }
         });
 
