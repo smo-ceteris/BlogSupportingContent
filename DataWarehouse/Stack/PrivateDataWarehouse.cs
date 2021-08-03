@@ -43,7 +43,7 @@ class PrivateDataWarehouse : Stack
         var subscription = config.General.SubscriptionId ?? throw new ArgumentNullException("Provide a subscriptionId in your config!");
 
         // configure naming conventions
-        var resourceGroupName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-rg";
+        var resourceGroupName = companyName.ToUpper() + "-" + projectName.ToUpper() + "-" + stackName.ToUpper();
         var storageAccountName = companyName.ToLower() + projectName.ToLower() + stackName.ToLower() + "st";
         var sqlServerName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-sql";
         var dataFactoryName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-adf";
@@ -51,37 +51,29 @@ class PrivateDataWarehouse : Stack
         var privateEndpointBlobName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-pe-blob";
         var privateEndpointAdfName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-pe-adf";
 
-        // create resource group
-        // var resourceGroupDatamart = new ResourceGroup(resourceGroupName, new ResourceGroupArgs()
-        // {
-        //     ResourceGroupName = resourceGroupName
-        // }
-        // );
-
         // retrieve resource group
         var resourceGroupDatamartRef = Output.Create(GetResourceGroup.InvokeAsync(new GetResourceGroupArgs
         {
-            ResourceGroupName = "GHD-DWH"
+            ResourceGroupName = resourceGroupName
         }));
         var resourceGroupDatamartName = resourceGroupDatamartRef.Apply(x => x.Name);
-        
+        var resourceGroupDatamartId = resourceGroupDatamartRef.Apply(x => x.Id);
 
         // retrieve security groups for end user permissions from AD
-        // var adSecurityGroupAdminRef = Output.Create(GetGroup.InvokeAsync(new GetGroupArgs
-        // {
-        //     SecurityEnabled = true,
-        //     DisplayName = config.Ad.AdminGroupName
-            
-        // }));
-        // var adSecurityGroupAdminObjectId = adSecurityGroupAdminRef.Apply(x => x.Id) ?? throw new ArgumentNullException("Provide a valid admin group in your config!");
-        // var adSecurityGroupAdminName = adSecurityGroupAdminRef.Apply(x => x.DisplayName) ?? throw new ArgumentNullException("Provide a valid admin group in your config!");
+        var adSecurityGroupAdminRef = Output.Create(GetGroup.InvokeAsync(new GetGroupArgs
+        {
+            SecurityEnabled = true,
+            DisplayName = config.Ad.AdminGroupName
+        }));
+        var adSecurityGroupAdminObjectId = adSecurityGroupAdminRef.Apply(x => x.Id) ?? throw new ArgumentNullException("Provide a valid admin group in your config!");
+        var adSecurityGroupAdminName = adSecurityGroupAdminRef.Apply(x => x.DisplayName) ?? throw new ArgumentNullException("Provide a valid admin group in your config!");
 
-        // var adSecurityGroupUserRef = Output.Create(GetGroup.InvokeAsync(new GetGroupArgs
-        // {
-        //     SecurityEnabled = true,
-        //     DisplayName = config.Ad.UserGroupName
-        // }));
-        // var adSecurityGroupUserObjectId = adSecurityGroupUserRef.Apply(x => x.Id) ?? throw new ArgumentNullException("Provide a valid user group in your config!");
+        var adSecurityGroupUserRef = Output.Create(GetGroup.InvokeAsync(new GetGroupArgs
+        {
+            SecurityEnabled = true,
+            DisplayName = config.Ad.UserGroupName
+        }));
+        var adSecurityGroupUserObjectId = adSecurityGroupUserRef.Apply(x => x.Id) ?? throw new ArgumentNullException("Provide a valid user group in your config!");
         
         // retrieve dependent datamart subnet
         var subnetRef = Output.Create(GetSubnet.InvokeAsync(new GetSubnetArgs
@@ -147,24 +139,24 @@ class PrivateDataWarehouse : Stack
             PublicNetworkAccess = ServerPublicNetworkAccess.Disabled
         });
 
-        // var serverAzureAdOnlyAuth = new ServerAzureADOnlyAuthentication("Default", new ServerAzureADOnlyAuthenticationArgs
-        // {
-        //     AuthenticationName = "Default",
-        //     AzureADOnlyAuthentication = true,
-        //     ResourceGroupName = resourceGroupDatamartName,
-        //     ServerName = sqlServer.Name
-        // });
+        var serverAzureAdOnlyAuth = new ServerAzureADOnlyAuthentication("Default", new ServerAzureADOnlyAuthenticationArgs
+        {
+            AuthenticationName = "Default",
+            AzureADOnlyAuthentication = true,
+            ResourceGroupName = resourceGroupDatamartName,
+            ServerName = sqlServer.Name
+        });
         
-        // var serverAzureAdAdministrator = new ServerAzureADAdministrator("ActiveDirectory",new ServerAzureADAdministratorArgs
-        // {
-        //     AdministratorName = "ActiveDirectory",
-        //     AdministratorType = AdministratorType.ActiveDirectory,
-        //     Login = adSecurityGroupAdminName,
-        //     ServerName = sqlServer.Name,
-        //     ResourceGroupName = resourceGroupDatamart.Name,
-        //     TenantId = config.General.TenantId ?? throw new ArgumentNullException("Provide a tenantId for this deployment!"),
-        //     Sid = adSecurityGroupAdminObjectId
-        // });
+        var serverAzureAdAdministrator = new ServerAzureADAdministrator("ActiveDirectory",new ServerAzureADAdministratorArgs
+        {
+            AdministratorName = "ActiveDirectory",
+            AdministratorType = AdministratorType.ActiveDirectory,
+            Login = adSecurityGroupAdminName,
+            ServerName = sqlServer.Name,
+            ResourceGroupName = resourceGroupDatamartName,
+            TenantId = config.General.TenantId ?? throw new ArgumentNullException("Provide a tenantId for this deployment!"),
+            Sid = adSecurityGroupAdminObjectId
+        });
 
         var sqlDatabase = new Database(config.Sql.SqlDatabaseName, new DatabaseArgs
         {
@@ -298,34 +290,34 @@ class PrivateDataWarehouse : Stack
             Scope = storageAccount.Id,
         });
 
-        // var authAdminGroupToStorageName1 = new RandomUuid("authAdminGroupToStorageName1");
-        // var authAdminGroupToStorage1 = new RoleAssignment("authAdminGroupToStorage1", new RoleAssignmentArgs
-        // {
-        //     PrincipalId = adSecurityGroupAdminObjectId,
-        //     PrincipalType = "Group",
-        //     RoleAssignmentName = authAdminGroupToStorageName1.Result,
-        //     RoleDefinitionId = StackExtensions.RetrieveRoleDefinitionId("Storage Blob Data Owner", subscription),
-        //     Scope = storageAccount.Id,
-        // });
+        var authAdminGroupToStorageName1 = new RandomUuid("authAdminGroupToStorageName1");
+        var authAdminGroupToStorage1 = new RoleAssignment("authAdminGroupToStorage1", new RoleAssignmentArgs
+        {
+            PrincipalId = adSecurityGroupAdminObjectId,
+            PrincipalType = "Group",
+            RoleAssignmentName = authAdminGroupToStorageName1.Result,
+            RoleDefinitionId = StackExtensions.RetrieveRoleDefinitionId("Storage Blob Data Owner", subscription),
+            Scope = storageAccount.Id,
+        });
 
-        // var authAdminGroupToResourceGroupName = new RandomUuid("authAdminGroupToResourceGroupName");
-        // var authAdminGroupToResourceGroup = new RoleAssignment("authAdminGroupToResourceGroup", new RoleAssignmentArgs
-        // {
-        //     PrincipalId = adSecurityGroupAdminObjectId,
-        //     PrincipalType = "Group",
-        //     RoleAssignmentName = authAdminGroupToResourceGroupName.Result,
-        //     RoleDefinitionId = StackExtensions.RetrieveRoleDefinitionId("Contributor", subscription),
-        //     Scope = resourceGroupDatamart.Id,
-        // });
+        var authAdminGroupToResourceGroupName = new RandomUuid("authAdminGroupToResourceGroupName");
+        var authAdminGroupToResourceGroup = new RoleAssignment("authAdminGroupToResourceGroup", new RoleAssignmentArgs
+        {
+            PrincipalId = adSecurityGroupAdminObjectId,
+            PrincipalType = "Group",
+            RoleAssignmentName = authAdminGroupToResourceGroupName.Result,
+            RoleDefinitionId = StackExtensions.RetrieveRoleDefinitionId("Contributor", subscription),
+            Scope = resourceGroupDatamartId,
+        });
 
-        // var authUserGroupToStorageName = new RandomUuid("authUserGroupToStorageName");
-        // var authUserGroupToStorage = new RoleAssignment("authUserGroupToStorage", new RoleAssignmentArgs
-        // {
-        //     PrincipalId = adSecurityGroupUserObjectId,
-        //     PrincipalType = "Group",
-        //     RoleAssignmentName = authUserGroupToStorageName.Result,
-        //     RoleDefinitionId = StackExtensions.RetrieveRoleDefinitionId("Storage Blob Data Reader", subscription),
-        //     Scope = storageAccount.Id,
-        // });
+        var authUserGroupToStorageName = new RandomUuid("authUserGroupToStorageName");
+        var authUserGroupToStorage = new RoleAssignment("authUserGroupToStorage", new RoleAssignmentArgs
+        {
+            PrincipalId = adSecurityGroupUserObjectId,
+            PrincipalType = "Group",
+            RoleAssignmentName = authUserGroupToStorageName.Result,
+            RoleDefinitionId = StackExtensions.RetrieveRoleDefinitionId("Storage Blob Data Reader", subscription),
+            Scope = storageAccount.Id,
+        });
     }
 }
