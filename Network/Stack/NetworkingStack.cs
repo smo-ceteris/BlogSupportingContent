@@ -39,6 +39,8 @@ class NetworkingStack : Stack
         var nsgBastionName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-nsg-bastion";
         var nsgDwhName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-nsg-dwh";
         var nsgMgmtName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-nsg-mgmt";
+        var bastionName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-bst";
+        var bastionIpName = companyName.ToLower() + "-" + projectName.ToLower() + "-" + stackName.ToLower() + "-ip-bastion";
 
         // retrieve network and origin resource group
         var vnetRef = Output.Create(Network.GetVirtualNetwork.InvokeAsync(new Network.GetVirtualNetworkArgs
@@ -252,7 +254,7 @@ class NetworkingStack : Stack
             }
         });
 
-        var subnetBastion = new Network.Subnet(config.Security.SubnetBastionName, new Pulumi.AzureNative.Network.SubnetArgs()
+        var subnetBastion = new Network.Subnet(config.Security.SubnetBastionName, new Network.SubnetArgs()
         {
             VirtualNetworkName = virtualNetworkName,  
             ResourceGroupName = resourceGroupOriginName,      
@@ -263,6 +265,38 @@ class NetworkingStack : Stack
             {
                 Id = nsgBastion.Id
             },
+        });
+
+        // create bastion and allocated public ip
+        var publicBastionIp = new Network.PublicIPAddress(bastionIpName, new Network.PublicIPAddressArgs()
+        {
+            ResourceGroupName = resourceGroupOriginName,
+            PublicIPAllocationMethod = Network.IPAllocationMethod.Static,
+            Sku = new Network.Inputs.PublicIPAddressSkuArgs
+            {
+                Name = Network.PublicIPAddressSkuName.Standard,
+                Tier = Network.PublicIPAddressSkuTier.Global,
+            },
+            PublicIpAddressName = bastionIpName
+        });
+
+        var bastion = new Network.BastionHost(bastionName, new Pulumi.AzureNative.Network.BastionHostArgs()
+        {
+            BastionHostName = bastionName,
+            ResourceGroupName = resourceGroupOriginName,
+            IpConfigurations = new NetworkInputs.BastionHostIPConfigurationArgs()
+            {
+                Name = "IpConfiguration",
+                PrivateIPAllocationMethod = Network.IPAllocationMethod.Dynamic,
+                PublicIPAddress = new Network.Inputs.SubResourceArgs
+                {
+                    Id = publicBastionIp.Id,
+                },
+                Subnet = new Network.Inputs.SubResourceArgs
+                {
+                    Id = subnetBastion.Id,
+                }
+            }
         });
 
         this.SubnetDev = subnetDev.Id;

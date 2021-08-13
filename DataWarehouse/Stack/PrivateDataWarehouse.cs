@@ -139,14 +139,6 @@ class PrivateDataWarehouse : Stack
             PublicNetworkAccess = ServerPublicNetworkAccess.Disabled
         });
 
-        var serverAzureAdOnlyAuth = new ServerAzureADOnlyAuthentication("Default", new ServerAzureADOnlyAuthenticationArgs
-        {
-            AuthenticationName = "Default",
-            AzureADOnlyAuthentication = true,
-            ResourceGroupName = resourceGroupDatamartName,
-            ServerName = sqlServer.Name
-        });
-        
         var serverAzureAdAdministrator = new ServerAzureADAdministrator("ActiveDirectory",new ServerAzureADAdministratorArgs
         {
             AdministratorName = "ActiveDirectory",
@@ -156,6 +148,18 @@ class PrivateDataWarehouse : Stack
             ResourceGroupName = resourceGroupDatamartName,
             TenantId = config.General.TenantId ?? throw new ArgumentNullException("Provide a tenantId for this deployment!"),
             Sid = adSecurityGroupAdminObjectId
+        });
+
+        var serverAzureAdOnlyAuth = new ServerAzureADOnlyAuthentication("Default", new ServerAzureADOnlyAuthenticationArgs
+        {
+            AuthenticationName = "Default",
+            AzureADOnlyAuthentication = true,
+            ResourceGroupName = resourceGroupDatamartName,
+            ServerName = sqlServer.Name
+        },
+        new CustomResourceOptions
+        { 
+            DependsOn = {serverAzureAdAdministrator} 
         });
 
         var sqlDatabase = new Database(config.Sql.SqlDatabaseName, new DatabaseArgs
