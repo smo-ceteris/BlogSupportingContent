@@ -112,6 +112,18 @@ class NetworkingStack : Stack
                     SourceAddressPrefix = "VirtualNetwork",
                     SourcePortRange = "*"
                 },
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Deny",
+                    DestinationAddressPrefix = "*",
+                    DestinationPortRanges = "*",
+                    Direction = "Inbound",
+                    Name = "DenyAllInBound",
+                    Priority = 4050,
+                    Protocol = "*",
+                    SourceAddressPrefix = "*",
+                    SourcePortRange = "*"
+                },
                 
                 // outbound rules
                 new NetworkInputs.SecurityRuleArgs
@@ -161,6 +173,18 @@ class NetworkingStack : Stack
                     Protocol = "TCP",
                     SourceAddressPrefix = "*",
                     SourcePortRange = "*"
+                },
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Deny",
+                    DestinationAddressPrefix = "*",
+                    DestinationPortRange = "*",
+                    Direction = "Outbound",
+                    Name = "DenyAllOutBound",
+                    Priority = 4050,
+                    Protocol = "*",
+                    SourceAddressPrefix = "*",
+                    SourcePortRange = "*"
                 }
             }
         });
@@ -172,7 +196,30 @@ class NetworkingStack : Stack
             SecurityRules =
             {
                 // inbound rules
-                                
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Allow",
+                    DestinationAddressPrefix = "10.5.1.0/24",
+                    DestinationPortRange = "*",
+                    Direction = "Inbound",
+                    Name = "AllowSelectedVnetInBound",
+                    Priority = 2000,
+                    Protocol = "*",
+                    SourceAddressPrefix = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"},
+                    SourcePortRange = "*"
+                }, 
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Deny",
+                    DestinationAddressPrefix = "*",
+                    DestinationPortRange = "*",
+                    Direction = "Inbound",
+                    Name = "DenyAllInBound",
+                    Priority = 4050,
+                    Protocol = "*",
+                    SourceAddressPrefix = "*",
+                    SourcePortRange = "*"
+                },               
                 // outbound rules
                 new NetworkInputs.SecurityRuleArgs
                 {
@@ -182,6 +229,30 @@ class NetworkingStack : Stack
                     Direction = "Outbound",
                     Name = "DenyInternetOutBound",
                     Priority = 200,
+                    Protocol = "*",
+                    SourceAddressPrefix = "*",
+                    SourcePortRange = "*"
+                },
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Allow",
+                    DestinationAddressPrefix = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"},
+                    DestinationPortRange = "*",
+                    Direction = "Outbound",
+                    Name = "AllowSelectedVnetOutBound",
+                    Priority = 2000,
+                    Protocol = "*",
+                    SourceAddressPrefix = "10.5.1.0/24",
+                    SourcePortRange = "*"
+                },
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Deny",
+                    DestinationAddressPrefix = "*",
+                    DestinationPortRange = "*",
+                    Direction = "Outbound",
+                    Name = "DenyAllOutBound",
+                    Priority = 4050,
                     Protocol = "*",
                     SourceAddressPrefix = "*",
                     SourcePortRange = "*"
@@ -196,8 +267,55 @@ class NetworkingStack : Stack
             SecurityRules =
             {
                 // inbound rules
-                                
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Allow",
+                    DestinationAddressPrefix = "10.5.1.0/24",
+                    DestinationPortRange = "*",
+                    Direction = "Inbound",
+                    Name = "AllowSelectedVnetInBound",
+                    Priority = 2000,
+                    Protocol = "*",
+                    SourceAddressPrefix = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"},
+                    SourcePortRange = "*"
+                }, 
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Deny",
+                    DestinationAddressPrefix = "*",
+                    DestinationPortRange = "*",
+                    Direction = "Inbound",
+                    Name = "DenyAllInBound",
+                    Priority = 4050,
+                    Protocol = "*",
+                    SourceAddressPrefix = "*",
+                    SourcePortRange = "*"
+                },               
                 // outbound rules
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Allow",
+                    DestinationAddressPrefix = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"},
+                    DestinationPortRange = "*",
+                    Direction = "Outbound",
+                    Name = "AllowSelectedVnetOutBound",
+                    Priority = 2000,
+                    Protocol = "*",
+                    SourceAddressPrefix = "10.5.1.0/24",
+                    SourcePortRange = "*"
+                },
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Deny",
+                    DestinationAddressPrefix = "*",
+                    DestinationPortRange = "*",
+                    Direction = "Outbound",
+                    Name = "DenyAllOutBound",
+                    Priority = 4050,
+                    Protocol = "*",
+                    SourceAddressPrefix = "*",
+                    SourcePortRange = "*"
+                }
             }
         });
 
