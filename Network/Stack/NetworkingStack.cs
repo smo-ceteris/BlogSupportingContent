@@ -205,7 +205,7 @@ class NetworkingStack : Stack
                     Name = "AllowSelectedVnetInBound",
                     Priority = 2000,
                     Protocol = "*",
-                    SourceAddressPrefix = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"},
+                    SourceAddressPrefixes = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"},
                     SourcePortRange = "*"
                 }, 
                 new NetworkInputs.SecurityRuleArgs
@@ -236,7 +236,7 @@ class NetworkingStack : Stack
                 new NetworkInputs.SecurityRuleArgs
                 {
                     Access = "Allow",
-                    DestinationAddressPrefix = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"},
+                    DestinationAddressPrefixes = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"},
                     DestinationPortRange = "*",
                     Direction = "Outbound",
                     Name = "AllowSelectedVnetOutBound",
@@ -276,8 +276,8 @@ class NetworkingStack : Stack
                     Name = "AllowSelectedVnetInBound",
                     Priority = 2000,
                     Protocol = "*",
-                    SourceAddressPrefix = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"},
-                    SourcePortRange = "*"
+                    SourcePortRange = "*",
+                    SourceAddressPrefixes = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"}
                 }, 
                 new NetworkInputs.SecurityRuleArgs
                 {
@@ -295,7 +295,46 @@ class NetworkingStack : Stack
                 new NetworkInputs.SecurityRuleArgs
                 {
                     Access = "Allow",
-                    DestinationAddressPrefix = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"},
+                    Description = "allows Azure Ad auth on SQL Server",
+                    DestinationAddressPrefix = "AzureActiveDirectory",
+                    DestinationPortRange = "*",
+                    Direction = "Outbound",
+                    Name = "AllowAzureAdOutbound",
+                    Priority = 1890,
+                    Protocol = "*",
+                    SourceAddressPrefix = "*",
+                    SourcePortRange = "*"
+                },
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Allow",
+                    Description = "used for static content needed at aad login with MFA",
+                    DestinationAddressPrefix = "13.107.0.0/16",
+                    DestinationPortRanges = new List<string>{"80","443"},
+                    Direction = "Outbound",
+                    Name = "AllowAzureAdCdnOutbound",
+                    Priority = 1880,
+                    Protocol = "TCP",
+                    SourceAddressPrefix = "*",
+                    SourcePortRange = "*"
+                },
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Allow",
+                    Description = "allows management vm to communicate with Azure cloud",
+                    DestinationAddressPrefix = "AzureCloud",
+                    DestinationPortRange = "*",
+                    Direction = "Outbound",
+                    Name = "AllowAzureCloudOutbound",
+                    Priority = 1900,
+                    Protocol = "*",
+                    SourceAddressPrefix = "*",
+                    SourcePortRange = "*"
+                },
+                new NetworkInputs.SecurityRuleArgs
+                {
+                    Access = "Allow",
+                    DestinationAddressPrefixes = new List<string>{"10.5.1.0/24","10.5.4.0/22","10.20.19.0/24","10.20.20.0/24"},
                     DestinationPortRange = "*",
                     Direction = "Outbound",
                     Name = "AllowSelectedVnetOutBound",
