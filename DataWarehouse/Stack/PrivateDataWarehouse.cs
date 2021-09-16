@@ -162,10 +162,32 @@ class PrivateDataWarehouse : Stack
             DependsOn = {serverAzureAdAdministrator} 
         });
 
-        var sqlDatabase = new Database(config.Sql.SqlDatabaseName, new DatabaseArgs
+        var sqlDatabaseStaging = new Database(config.Sql.SqlDatabaseNameStaging, new DatabaseArgs
         {
             ResourceGroupName = resourceGroupDatamartName,
-            DatabaseName = config.Sql.SqlDatabaseName,
+            DatabaseName = config.Sql.SqlDatabaseNameStaging,
+            ServerName = sqlServer.Name,
+            Sku = new Pulumi.AzureNative.Sql.Inputs.SkuArgs
+            {
+                Name = config.Sql.SqlDatabaseTier
+            }
+        });
+
+        var sqlDatabaseBusiness = new Database(config.Sql.SqlDatabaseNameBusiness, new DatabaseArgs
+        {
+            ResourceGroupName = resourceGroupDatamartName,
+            DatabaseName = config.Sql.SqlDatabaseNameBusiness,
+            ServerName = sqlServer.Name,
+            Sku = new Pulumi.AzureNative.Sql.Inputs.SkuArgs
+            {
+                Name = config.Sql.SqlDatabaseTier
+            }
+        });
+
+        var sqlDatabaseIntegration = new Database(config.Sql.SqlDatabaseNameIntegration, new DatabaseArgs
+        {
+            ResourceGroupName = resourceGroupDatamartName,
+            DatabaseName = config.Sql.SqlDatabaseNameIntegration,
             ServerName = sqlServer.Name,
             Sku = new Pulumi.AzureNative.Sql.Inputs.SkuArgs
             {

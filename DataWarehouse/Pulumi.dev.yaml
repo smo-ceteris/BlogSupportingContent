@@ -12,7 +12,9 @@ config:
     VirtualNetworkName: "ghd-dwh-vnet"
     ResourceGroupName: "GHD-DWH"
   GHD.Infrastructure:Sql:
-    SqlDatabaseName: analytics
+    SqlDatabaseNameStaging: Staging
+    SqlDatabaseNameBusiness: Business
+    SqlDatabaseNameIntegration: Integration
     SqlDatabaseTier: S3
     SqlServerAdmin: Ceteris.Admin
     SqlServerPassword:
