@@ -126,6 +126,15 @@ class PrivateDataWarehouse : Stack
             PublicAccess = PublicAccess.None,
             ResourceGroupName = resourceGroupDatamartName,
             ContainerName = config.Storage.ContainerSpeedName
+        });
+
+        // vulnerability storage account is always set staticly for now
+        var containerVulnerability = new BlobContainer("vulnerability", new BlobContainerArgs
+        {
+            AccountName = storageAccount.Name,
+            PublicAccess = PublicAccess.None,
+            ResourceGroupName = resourceGroupDatamartName,
+            ContainerName = "vulnerability"
         }); 
 
         // create sql server and database
@@ -136,7 +145,11 @@ class PrivateDataWarehouse : Stack
             AdministratorLogin = config.Sql.SqlServerAdmin,
             AdministratorLoginPassword = config.Sql.SqlServerPassword ?? throw new ArgumentNullException("Provide a Password for SQL server!"),
             MinimalTlsVersion = "1.2",
-            PublicNetworkAccess = ServerPublicNetworkAccess.Disabled
+            PublicNetworkAccess = ServerPublicNetworkAccess.Disabled,
+            Identity = new Pulumi.AzureNative.Sql.Inputs.ResourceIdentityArgs
+            {
+                Type = Pulumi.AzureNative.Sql.IdentityType.SystemAssigned
+            },
         });
 
         var serverAzureAdAdministrator = new ServerAzureADAdministrator("ActiveDirectory",new ServerAzureADAdministratorArgs
@@ -194,6 +207,21 @@ class PrivateDataWarehouse : Stack
                 Name = config.Sql.SqlDatabaseTier
             }
         });
+
+        // add vulnerability assessment to sql server
+        var sqlServerVulnerabilityAssessment = new ServerVulnerabilityAssessment("sqlServerVulnerabilityAssessment", new ServerVulnerabilityAssessmentArgs
+        {
+            RecurringScans = new Pulumi.AzureNative.Sql.Inputs.VulnerabilityAssessmentRecurringScansPropertiesArgs
+            {
+                EmailSubscriptionAdmins = true,
+                IsEnabled = true,
+            },
+            ResourceGroupName = resourceGroupDatamartName,
+            ServerName = sqlServer.Name,
+            StorageContainerPath = $"{storageAccount.PrimaryEndpoints}/{containerVulnerability.Name}",  //"https://myStorage.blob.core.windows.net/vulnerability-assessment/",
+            VulnerabilityAssessmentName = "default"
+        });
+
 
         // create data factory
         var dataFactory = new Factory(dataFactoryName, new FactoryArgs
@@ -312,6 +340,16 @@ class PrivateDataWarehouse : Stack
             PrincipalId = dataFactory.Identity.Apply(x => x.PrincipalId),
             PrincipalType = "ServicePrincipal",
             RoleAssignmentName = authAdfToStorageName.Result,
+            RoleDefinitionId = StackExtensions.RetrieveRoleDefinitionId("Storage Blob Data Contributor", subscription),
+            Scope = storageAccount.Id,
+        });
+
+        var authSqlToStorageName = new RandomUuid("authSqlToStorageName");
+        var authSqlToStorage = new RoleAssignment("authSqlToStorage", new RoleAssignmentArgs
+        {
+            PrincipalId = sqlServer.Identity.Apply(x => x.PrincipalId),
+            PrincipalType = "ServicePrincipal",
+            RoleAssignmentName = authSqlToStorageName.Result,
             RoleDefinitionId = StackExtensions.RetrieveRoleDefinitionId("Storage Blob Data Contributor", subscription),
             Scope = storageAccount.Id,
         });
