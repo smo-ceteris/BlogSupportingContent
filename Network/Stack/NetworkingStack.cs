@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Pulumi;
 using Pulumi.AzureNative.Resources;
 using Network = Pulumi.AzureNative.Network;
+using Pulumi.AzureNative.Compute;
 using NetworkInputs = Pulumi.AzureNative.Network.Inputs;
-
 using Ceteris.Configuration;
 using Ceteris.Extensions;
 using System;
